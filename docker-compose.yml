@@ -6,25 +6,29 @@ services:
   influxdb:
     image: influxdb:latest
     ports:
-      - '8086:8086'
+      - "8086:8086"
     volumes:
       - influxdb_storage:/var/lib/influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+
   chronograf:
     image: chronograf:latest
     ports:
-      - '8888:8888'
+      - "8888:8888"
     volumes:
       - chronograf_storage:/var/lib/chronograf
     depends_on:
       - influxdb
     environment:
-      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_URL="http://influxdb:8086"
       - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
       - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
   grafana:
     image: grafana/grafana:latest
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - influxdb
     volumes:
