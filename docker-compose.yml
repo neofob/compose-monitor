@@ -4,17 +4,25 @@ version: '3'
 
 services:
   influxdb:
+    container_name: influxdb
+    hostname: influxdb
     image: influxdb:latest
+    restart: always
     ports:
       - "8086:8086"
     volumes:
       - influxdb_storage:/var/lib/influxdb
     environment:
-      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=neofob
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensor
 
   chronograf:
+    container_name: chronograf
+    hostname: chronograf
     image: chronograf:latest
+    restart: always
     ports:
       - "8888:8888"
     volumes:
@@ -23,10 +31,13 @@ services:
       - influxdb
     environment:
       - INFLUXDB_URL="http://influxdb:8086"
-      - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
-      - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
+      - INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+      - INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
   grafana:
+    container_name: grafana
+    hostname: grafana
     image: grafana/grafana:latest
+    restart: always
     ports:
       - "3000:3000"
     depends_on:
