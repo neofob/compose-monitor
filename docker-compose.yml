@@ -1,7 +1,6 @@
 ---
 version: '3'
 
-
 services:
   influxdb:
     container_name: influxdb
@@ -11,12 +10,15 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - influxdb_storage:/var/lib/influxdb
+      - influxdb_storage:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
     environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
-      - DOCKER_INFLUXDB_INIT_ORG=neofob
-      - DOCKER_INFLUXDB_INIT_BUCKET=sensor
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
 
   chronograf:
     container_name: chronograf
@@ -46,6 +48,11 @@ services:
       - grafana_data:/var/lib/grafana
 
 volumes:
-  chronograf_storage: {}
-  influxdb_storage: {}
-  grafana_data: {}
+  chronograf_storage:
+    external: true
+  influxdb_storage:
+    external: true
+  influxdb_config:
+    external: true
+  grafana_data:
+    external: true
