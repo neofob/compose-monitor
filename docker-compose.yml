@@ -23,6 +23,11 @@ services:
       resources:
         limits:
           memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "1"
 
   chronograf:
     container_name: chronograf
@@ -43,6 +48,11 @@ services:
       resources:
         limits:
           memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "1"
 
   grafana:
     container_name: grafana
@@ -59,6 +69,11 @@ services:
       resources:
         limits:
           memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "1"
 
   pp-code-metrics:
     container_name: pp-code-metrics
@@ -73,6 +88,12 @@ services:
       resources:
         limits:
           memory: 32M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "1"
+
 
   temper:
     container_name: temper
@@ -88,6 +109,11 @@ services:
       resources:
         limits:
           memory: 32M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "1"
 
 volumes:
   chronograf_storage:
