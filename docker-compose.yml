@@ -1,6 +1,5 @@
+# Sample docker-compose for serve simple metrics and Grafana
 ---
-version: '3.7'
-
 services:
   influxdb:
     container_name: influxdb
@@ -13,46 +12,48 @@ services:
       - influxdb_storage:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
+# Uncomment the INIT_MODE var to run it in setup at the first time
+#      - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
       - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
       - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+      - INFLUXD_STORAGE_CACHE_MAX_MEMORY_SIZE=${INFLUXD_STORAGE_CACHE_MAX_MEMORY_SIZE}
+      - INFLUXD_STORAGE_CACHE_SNAPSHOT_MEMORY_SIZE=${INFLUXD_STORAGE_CACHE_SNAPSHOT_MEMORY_SIZE}
+      - INFLUXD_STORAGE_CACHE_SNAPSHOT_WRITE_COLD_DURATION=${INFLUXD_STORAGE_CACHE_SNAPSHOT_WRITE_COLD_DURATION}
+      - INFLUXD_STORAGE_COMPACT_FULL_WRITE_COLD_DURATION=${INFLUXD_STORAGE_COMPACT_FULL_WRITE_COLD_DURATION}
+      - INFLUXD_STORAGE_RETENTION_CHECK_INTERVAL=${INFLUXD_STORAGE_RETENTION_CHECK_INTERVAL}
     logging:
       driver: "json-file"
       options:
         max-size: "1M"
         max-file: "1"
 
-  chronograf:
-    container_name: chronograf
-    hostname: chronograf
-    image: chronograf:latest
-    restart: always
-    ports:
-      - "8888:8888"
-    volumes:
-      - chronograf_storage:/var/lib/chronograf
-    depends_on:
-      - influxdb
-    environment:
-      - INFLUXDB_URL="http://influxdb:8086"
-      - INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
-      - INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1M"
-        max-file: "1"
+#  chronograf:
+#    container_name: chronograf
+#    hostname: chronograf
+#    image: chronograf:latest
+#    restart: always
+#    ports:
+#      - "8888:8888"
+#    volumes:
+#      - chronograf_storage:/var/lib/chronograf
+#    depends_on:
+#      - influxdb
+#    environment:
+#      - INFLUXDB_URL="http://influxdb:8086"
+#      - INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME}
+#      - INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 512M
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "1M"
+#        max-file: "1"
 
   grafana:
     container_name: grafana
@@ -82,18 +83,21 @@ services:
     restart: always
     depends_on:
       - influxdb
+      - temper
+    environment:
+      - INTERVAL=10
     volumes:
       - ./my_settings.yml:/opt/pp-code-metrics/my_settings.yml:ro
+      - ./crontab/pp-code-metrics.tmpl:/etc/cron.d/pp-code-metrics.tmpl
     deploy:
       resources:
         limits:
-          memory: 32M
+          memory: 128M
     logging:
       driver: "json-file"
       options:
         max-size: "1M"
         max-file: "1"
-
 
   temper:
     container_name: temper

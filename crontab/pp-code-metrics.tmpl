@@ -1,0 +1,6 @@
+# Run get_metrics.py every 10 minutes
+# INTERVAL=10 in Dockerfile
+
+# This is to run with pp-code-metrics
+
+*/{{ .Env.INTERVAL }} * * * *   /opt/pp-code-metrics/run_get_metrics.sh my_settings.yml
